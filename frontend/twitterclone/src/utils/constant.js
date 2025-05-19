@@ -1,5 +1,25 @@
-export const USER_API_END_POINT = "http://localhost:8080/api/v1/user";
-export const TWEET_API_END_POINT = "http://localhost:8080/api/v1/tweet";
+// Frontend constants.js
+// Dynamically determine the API endpoint based on environment
+const getAPIBaseURL = () => {
+    // Check if we're in production by looking at the hostname
+    const hostname = window.location.hostname;
+    
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        // Local development
+        return "http://localhost:8080/api/v1";
+    } else {
+        // Production on EC2 or elsewhere
+        // Use the same hostname as the frontend but with backend port
+        return `http://${hostname}:8080/api/v1`;
+        // If you're using HTTPS in production, use:
+        // return `https://${hostname}/api/v1`;
+    }
+};
+
+const BASE_API_URL = getAPIBaseURL();
+
+export const USER_API_END_POINT = `${BASE_API_URL}/user`;
+export const TWEET_API_END_POINT = `${BASE_API_URL}/tweet`;
 
 export const timeSince = (timestamp) => {
     let time = Date.parse(timestamp);
@@ -24,4 +44,6 @@ export const timeSince = (timestamp) => {
             return `${count} ${i} ${count > 1 ? 's' : ''} ${suffix}`;
         }
     }
+    
+    return 'just now';
 }
