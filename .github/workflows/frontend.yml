@@ -1,0 +1,44 @@
+name: Deploy Frontend (EchoMateLite)
+
+on:
+  push:
+    branches: [mern-ec2-docker-ssl]
+    paths:
+      - 'frontend/**'  # Trigger only when frontend files change
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        
+      - name: Build Docker Image
+        run: |
+          cd frontend  # Navigate to frontend directory
+          docker build \
+            -t manthan1310/echomatelite-frontend \
+            --build-arg REACT_APP_API_URL='${{ secrets.REACT_APP_API_URL }}' .
+        
+      - name: Publish Image
+        run: docker push manthan1310/echomatelite-frontend:latest
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Pull Image
+        run: docker pull manthan1310/echomatelite-frontend:latest
+        
+      - name: Stop Old Container
+        run: docker rm -f echomate-frontend || true
+        
+      - name: Run Container
+        run: |
+          docker run -d \
+            --name echomate-frontend \
+            -p 3000:80 \  # Host:3000 → Container:80
+            manthan1310/echomatelite-frontend

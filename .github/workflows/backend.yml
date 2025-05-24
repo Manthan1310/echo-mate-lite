@@ -1,0 +1,31 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main]
+    paths: ['backend/**']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - run: |
+          cd backend
+          docker build -t manthan1310/echomatelite-backend .
+          docker push manthan1310/echomatelite-backend:latest
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - run: docker pull manthan1310/echomatelite-backend:latest
+      - run: docker rm -f echomate-backend || true
+      - run: |
+          docker run -d \
+            --name echomate-backend \
+            -p 8080:8080 \
+            -e MONGO_URI="${{ secrets.MONGO_URI }}" \
+            -e PORT=8080 \
+            manthan1310/echomatelite-backend

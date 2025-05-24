@@ -24,7 +24,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Updated CORS configuration
 const corsOptions = {
-    origin: ["http://65.1.248.203:3000", "http://localhost:3000"], // Allow both EC2 and local frontend
+	origin: ["http://13.204.34.42:3000", "http://localhost:3000"], // Allow both EC2 ane local fronten
     credentials: true, // Enable credentials (cookies, authorization headers, etc.)
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
